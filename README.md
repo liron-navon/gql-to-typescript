@@ -31,8 +31,8 @@ And after going through the converter, we will get this great typescript file, w
 ```typescript
 export namespace StarTreckApi {
 	export interface Query {
-	/*  Live long, and prosper. 🖖  */
-		getSpoke?: (season: string) => Spoke;
+	  /*  Live long, and prosper. 🖖  */
+	  getSpoke?: (season: string) => Spoke;
 	}
 	export interface Spoke {
 	  name?: string
