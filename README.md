@@ -29,7 +29,7 @@ const mySchema = gql`
 And after going through the converter, we will get this great typescript file, we even get the optionals, but do notice that all functions will be optionals to make life easier when using Query or Mutation in your ts code.
 
 ```typescript
-export namespace StarTreckApi {
+export namespace StarTrackApi {
 	export interface Query {
 	  /*  Live long, and prosper. 🖖  */
 	  getSpoke?: (season: string) => Spoke;
