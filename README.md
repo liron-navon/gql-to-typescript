@@ -35,7 +35,7 @@ export namespace StarTreckApi {
 		getSpoke?: (season: string) => Spoke;
 	}
 	export interface Spoke {
-		  name?: string
+	  name?: string
           age?: number
           id: string | number
 	}
