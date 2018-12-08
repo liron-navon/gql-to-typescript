@@ -5,19 +5,12 @@ import {TypescriptFileWriter} from "./helpers/TypescriptFileWriter";
 
 const defaultsDeep = require('lodash/defaultsDeep');
 
-const customTypes = {
-    TypeURL: 'string',
-    typeHTML: 'string',
-    TypeAny: 'any',
-    TypeHashMap: `{ 
-            [key: string]: any
-        }`
-};
+const customTypes = {};
 
 const defaultOptions = {
     scalars: customTypes,
     ignoreFields: ['_empty'],
-    ignoreTypes: [], //['Query', 'Mutation', 'Subscription', 'CountryEnum'],
+    ignoreTypes: [],
     namespace: 'GraphqlTypes',
     outputFile: 'types.ts'
 };
