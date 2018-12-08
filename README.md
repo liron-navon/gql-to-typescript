@@ -8,9 +8,25 @@ Lets say you have a bunch of files on the server, in which you use the gql tag, 
 
 ```typescript
 import { convertFiles } from 'gql-to-typescript';
+
+// pass a glob path to detect the files needed, files without gql tag will simply be ignored.
 convertFiles('/src/**/*.gql.ts', {
+	// where the output file will be
         outputFile: '/src/types/TypescriptIsAwesome.ts',
-        namespace: 'TypescriptIsAwesome'
+	// the typescript namespace to be used
+        namespace: 'TypescriptIsAwesome',
+	// define custom scalar types that map a name of the type to a ts type.
+	scalars: {
+    	  TypeAny: 'any',
+    	  TypeHashMap: `{ 
+            [key: string]: string|number
+          }`
+	},
+	// you can ignore some types and they will not appear in the ts file
+	ignoreTypes: ['Query', 'Mutation', 'MyTypeToIgnore']
+	// only _empty is ignored by default, you can pass an empty array to override this
+	// _empty is mostly used to create a base type and extend it over several schema shards
+	ignoreFields: ['_empty']
     })
 ```
 
