@@ -39,7 +39,7 @@ test('Detects this test file and generates a new file in temp.', () => {
     const tempFilePath = path.join(__dirname, `../temp/${Date.now()}=${randomUUID()}-types.ts`);
     const expectedOutput = removeAllSpaces(outputSample);
 
-    return convertFiles(__filename, {
+    return convertFiles('./**/*.ts', {
         outputFile: tempFilePath,
         namespace: 'TestNameSpace'
     })
@@ -50,22 +50,22 @@ test('Detects this test file and generates a new file in temp.', () => {
         });
 });
 
-test('Creates a file without by passing type definitions.', () => {
-    const tempFilePath = path.join(__dirname, `../temp/${Date.now()}=${randomUUID()}-types.ts`);
-    const expectedOutput = removeAllSpaces(outputSample);
-
-    return convert({
-        outputFile: tempFilePath,
-        namespace: 'TestNameSpace',
-        typeDefs: [inputSample]
-    })
-        .then(() => {
-            const generatedFileContent = fs.readFileSync(tempFilePath, "utf8");
-            const output = removeAllSpaces(generatedFileContent);
-            expect(expectedOutput).toEqual(output);
-        });
-});
-
+// test('Creates a file without by passing type definitions.', () => {
+//     const tempFilePath = path.join(__dirname, `../temp/${Date.now()}=${randomUUID()}-types.ts`);
+//     const expectedOutput = removeAllSpaces(outputSample);
+//
+//     return convert({
+//         outputFile: tempFilePath,
+//         namespace: 'TestNameSpace',
+//         typeDefs: [inputSample]
+//     })
+//         .then(() => {
+//             const generatedFileContent = fs.readFileSync(tempFilePath, "utf8");
+//             const output = removeAllSpaces(generatedFileContent);
+//             expect(expectedOutput).toEqual(output);
+//         });
+// });
+//
 
 function removeAllSpaces(str: string) {
     return str.replace(/\s/g, '')

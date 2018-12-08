@@ -8,11 +8,17 @@ import * as glob from 'glob';
  * @param fileContent
  */
 export function getTypeDefsFromFile(fileContent) {
-    const reg = /(gql`)[\S\s]*?(`;|`\s)/g;
+    // keep older regex versions please.
+    // *********8
+    // /(gql`)[\S\s]*?(`;|`\s)/g; - had issues with template syntax (${}), and it captured itself.
+    // *********8
+    const reg = /(gql`)(?!\))[A-Za-z0-9\s{}"!:\(\)_-]*?((?!\()`;|(?!\()`\s)/g
+
     let matches = reg.exec(fileContent);
     if (!matches || matches.length === 0) {
         return null;
     }
+
     let gqlTag = matches[0];
     gqlTag = gqlTag.substr(0, gqlTag.lastIndexOf('`'));
     gqlTag = gqlTag.substr(gqlTag.indexOf('`') + 1);
@@ -40,11 +46,13 @@ export function collectGQLTypeDefs(matcher: string, turnToNodeTree: boolean = tr
             // map files into gql definitions
             return fileNames.map((filePath) => {
                 const content = fs.readFileSync(filePath, "utf8");
-                const graphqlSheet = getTypeDefsFromFile(content);
-                return turnToNodeTree ? gql`${graphqlSheet}` : graphqlSheet;
+                return getTypeDefsFromFile(content);
             })
              // filter out matching files without gql
-            .filter(item => item !== null);
+            .filter(item => item !== null)
+            .map((item) => {
+                return turnToNodeTree ? gql`${item}` : item
+            })
         });
 }
 

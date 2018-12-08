@@ -253,7 +253,7 @@ var glob = __webpack_require__(/*! glob */ "glob");
 function getTypeDefsFromFile(fileContent) {
     var reg = /(gql`)[\S\s]*?(`;|`\s)/g;
     var matches = reg.exec(fileContent);
-    if (matches.length === 0) {
+    if (!matches || matches.length === 0) {
         return null;
     }
     var gqlTag = matches[0];
@@ -284,11 +284,11 @@ function collectGQLTypeDefs(matcher, turnToNodeTree) {
         // map files into gql definitions
         return fileNames.map(function (filePath) {
             var content = fs.readFileSync(filePath, "utf8");
-            var graphqlSheet = getTypeDefsFromFile(content);
-            return turnToNodeTree ? graphql_tag_1.default(templateObject_1 || (templateObject_1 = __makeTemplateObject(["", ""], ["", ""])), graphqlSheet) : graphqlSheet;
+            return getTypeDefsFromFile(content);
         })
             // filter out matching files without gql
-            .filter(function (item) { return item !== null; });
+            .filter(function (item) { return item !== null; })
+            .map(function (item) { return turnToNodeTree ? graphql_tag_1.default(templateObject_1 || (templateObject_1 = __makeTemplateObject(["", ""], ["", ""])), item) : item; });
     });
 }
 exports.collectGQLTypeDefs = collectGQLTypeDefs;
@@ -508,12 +508,7 @@ var files_1 = __webpack_require__(/*! ./helpers/files */ "./src/helpers/files.ts
 var gqlNodeTools_1 = __webpack_require__(/*! ./helpers/gqlNodeTools */ "./src/helpers/gqlNodeTools.ts");
 var TypescriptFileWriter_1 = __webpack_require__(/*! ./helpers/TypescriptFileWriter */ "./src/helpers/TypescriptFileWriter.ts");
 var defaultsDeep = __webpack_require__(/*! lodash/defaultsDeep */ "lodash/defaultsDeep");
-var customTypes = {
-    TypeURL: 'string',
-    typeHTML: 'string',
-    TypeAny: 'any',
-    TypeHashMap: "{ \n            [key: string]: any\n        }"
-};
+var customTypes = {};
 var defaultOptions = {
     scalars: customTypes,
     ignoreFields: ['_empty'],

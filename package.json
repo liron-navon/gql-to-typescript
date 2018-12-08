@@ -1,6 +1,6 @@
 {
   "name": "gql-to-typescript",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "A library that turns gql tags to typescript",
   "main": "dist/gql-to-typescript.js",
   "repository": "https://github.com/liron-navon/gql-to-typescript",
@@ -8,7 +8,8 @@
     "start": "npm run build && node dist/gql-to-typescript.js",
     "build": "webpack",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "prepublish": "npm run build"
   },
   "author": "Liron Navon",
   "license": "ISC",
