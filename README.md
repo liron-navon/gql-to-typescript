@@ -2,9 +2,13 @@
 
 ### usage
 
+First you gonna need to install it: `npm install --save gql-to-typescript`
+
 Lets say you have a bunch of files on the server, in which you use the gql tag, you want them to be turned into greatly typed typescript? it's simply a matter of calling:
+
 ```typescript
-gqlToTypescript.convertFiles('/src/**/*.gql.ts', {
+import { convertFiles } from 'gql-to-typescript';
+convertFiles('/src/**/*.gql.ts', {
         outputFile: '/src/types/TypescriptIsAwesome.ts',
         namespace: 'TypescriptIsAwesome'
     })
