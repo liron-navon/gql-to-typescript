@@ -31,7 +31,7 @@ convertFiles('/src/**/*.gql.ts', {
 ```
 
 Here is a sample file
-```typescript
+```graphql
 /* .... some code */
 const mySchema = gql`
     type Query {
@@ -50,15 +50,15 @@ And after going through the converter, we will get this great typescript file, w
 
 ```typescript
 export namespace StarTrackApi {
-	export interface Query {
-	  /*  Live long, and prosper. 🖖  */
-	  getSpoke?: (season: string) => Spoke;
-	}
-	export interface Spoke {
-	  name?: string
-      age?: number
-      id: string | number
-	}
+    export interface Query {
+        /*  Live long, and prosper. 🖖  */
+        getSpoke?: (season: string) => Spoke;
+    }
+    export interface Spoke {
+        name?: string
+        age?: number
+        id: string | number
+    }
 }
 ```
 
