@@ -56,8 +56,8 @@ export namespace StarTrackApi {
 	}
 	export interface Spoke {
 	  name?: string
-          age?: number
-          id: string | number
+      age?: number
+      id: string | number
 	}
 }
 ```
