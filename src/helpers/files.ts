@@ -10,7 +10,7 @@ import * as glob from 'glob';
 export function getTypeDefsFromFile(fileContent) {
     const reg = /(gql`)[\S\s]*?(`;|`\s)/g;
     let matches = reg.exec(fileContent);
-    if (matches.length === 0) {
+    if (!matches || matches.length === 0) {
         return null;
     }
     let gqlTag = matches[0];
