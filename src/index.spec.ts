@@ -1,7 +1,7 @@
 import {convertFiles, convert} from './index';
 import * as path from 'path';
-import * as randomUUID from 'uuid/v4'
-import gql from "graphql-tag";
+import * as randomUUID from 'uuid/v4';
+import gql from 'graphql-tag';
 import * as fs from 'fs';
 
 // a sample of gql tag usage
@@ -44,7 +44,7 @@ test('Detects this test file and generates a new file in temp.', () => {
         namespace: 'TestNameSpace'
     })
         .then(() => {
-            const generatedFileContent = fs.readFileSync(tempFilePath, "utf8");
+            const generatedFileContent = fs.readFileSync(tempFilePath, 'utf8');
             const output = removeAllSpaces(generatedFileContent);
             expect(expectedOutput).toEqual(output);
         });
@@ -60,7 +60,7 @@ test('Creates a file by passing type definitions.', () => {
         typeDefs: [inputSample]
     })
         .then(() => {
-            const generatedFileContent = fs.readFileSync(tempFilePath, "utf8");
+            const generatedFileContent = fs.readFileSync(tempFilePath, 'utf8');
             const output = removeAllSpaces(generatedFileContent);
             expect(expectedOutput).toEqual(output);
         });
@@ -73,5 +73,5 @@ test('Creates a file by passing type definitions.', () => {
  * @param str
  */
 function removeAllSpaces(str: string) {
-    return str.replace(/\s/g, '')
+    return str.replace(/\s/g, '');
 }
