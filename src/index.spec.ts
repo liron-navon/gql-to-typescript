@@ -41,7 +41,8 @@ test('Detects this test file and generates a new file in temp.', () => {
 
     return convertFiles('./**/*.ts', {
         outputFile: tempFilePath,
-        namespace: 'TestNameSpace'
+        namespace: 'TestNameSpace',
+        silent: true
     })
         .then(() => {
             const generatedFileContent = fs.readFileSync(tempFilePath, 'utf8');
@@ -57,7 +58,8 @@ test('Creates a file by passing type definitions.', () => {
     return convert({
         outputFile: tempFilePath,
         namespace: 'TestNameSpace',
-        typeDefs: [inputSample]
+        typeDefs: [inputSample],
+        silent: true
     })
         .then(() => {
             const generatedFileContent = fs.readFileSync(tempFilePath, 'utf8');

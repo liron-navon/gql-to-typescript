@@ -12,7 +12,8 @@ const defaultOptions = {
     ignoreFields: ['_empty'],
     ignoreTypes: [],
     namespace: 'GraphqlTypes',
-    outputFile: 'types.ts'
+    outputFile: 'types.ts',
+    silent: false
 };
 
 const fileMessage = `/*
@@ -30,7 +31,7 @@ export function convertFiles(matcher, options:GqlToTSPublicConfig = {}) {
 }
 
 export function convert(options: GqlToTSConfig) {
-    const {typeDefs, scalars, ignoreFields, ignoreTypes} = defaultsDeep(options, defaultOptions);
+    const {typeDefs, scalars, ignoreFields, ignoreTypes, silent} = defaultsDeep(options, defaultOptions);
 
     const ignoreMap = arrayToTruthMapper([...ignoreTypes, ...ignoreFields]);
     const typedValues = defaultsDeep({
@@ -84,5 +85,5 @@ export function convert(options: GqlToTSConfig) {
             writer.writeInterface(key, value, descriptionState);
         }
     });
-    return writer.finish();
+    return writer.finish(silent);
 }

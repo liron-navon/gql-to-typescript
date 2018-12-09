@@ -4,6 +4,7 @@ export interface GqlToTSPublicConfig {
     scalars?: any;
     ignoreFields?: string[];
     ignoreTypes?: string[];
+    silent?: boolean;
 }
 
 export interface GqlToTSConfig extends GqlToTSPublicConfig{

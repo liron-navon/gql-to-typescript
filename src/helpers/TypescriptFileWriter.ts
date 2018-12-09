@@ -17,18 +17,20 @@ export class TypescriptFileWriter {
                 .appendLine(`export namespace ${options.namespace} {`);
         }
     }
+
     append(str: string) {
         this.fw.appendLine(str);
         return this;
     }
 
-    writeDescription(indentation : string, description: string) {
+    writeDescription(indentation: string, description: string) {
         if (description) {
             this.append(`${indentation}/* ${description} */`)
         }
     }
+
     writeEnum(name: string, enumarations: Array<string>, descriptionMap: Mapper) {
-        this.writeDescription(`\t`,descriptionMap[name]);
+        this.writeDescription(`\t`, descriptionMap[name]);
         this.append(`\texport enum ${name} {`)
         enumarations.forEach(e => this.append(`\t\t${e},`));
         this.append('\t}')
@@ -41,8 +43,8 @@ export class TypescriptFileWriter {
     private createAdvancedInterfaceField(label: string, rawType: any) {
         let advancedType = 'any';
         if (rawType.kind === 'function') {
-            const { returnType, args } = rawType;
-            const printableArguments = args.map(({ name, required, type }) => {
+            const {returnType, args} = rawType;
+            const printableArguments = args.map(({name, required, type}) => {
                 return `${name}${required ? '' : '?'}: ${this.fixTyping(type)}`;
             }).join(', ');
             advancedType = `(${printableArguments}) => ${this.fixTyping(returnType)}`;
@@ -52,16 +54,17 @@ export class TypescriptFileWriter {
         }
         return `\t\t${label}?: ${advancedType};`;
     }
+
     private createRegularInterfaceField(label: string, rawType: string) {
-        const { type, required } = getTypeOptions(rawType);
+        const {type, required} = getTypeOptions(rawType);
         return `\t\t${label}${required ? '' : '?'}: ${this.fixTyping(type)};`;
     }
 
     writeInterface(name: string, data: Mapper, descriptionMap: Mapper) {
-        this.writeDescription(`\t`,descriptionMap[name]);
+        this.writeDescription(`\t`, descriptionMap[name]);
         this.append(`\texport interface ${name} {`);
         Object.entries(data).forEach(([label, rawType]) => {
-            this.writeDescription(`\t`,descriptionMap[`${name}->${label}`]);
+            this.writeDescription(`\t`, descriptionMap[`${name}->${label}`]);
             if (typeof rawType === "string") {
                 this.append(this.createRegularInterfaceField(label, rawType))
             } else {
@@ -71,18 +74,20 @@ export class TypescriptFileWriter {
         this.append('\t}')
     }
 
-    finish() {
-        const { options: { namespace }, fullFilePath } = this;
+    finish(silent: boolean = false) {
+        const {options: {namespace}, fullFilePath} = this;
         return this.fw
             .appendLine('}')
             .appendLine('')
             .finish()
             .then(() => {
-                console.log(`
-                The file was saved!.
+                if (!silent) {
+                    console.log(`
+                The types file was saved!.
                 You can import it like so:
                 import { ${namespace} } from '${fullFilePath}';
             `);
+                }
             })
     }
 }
