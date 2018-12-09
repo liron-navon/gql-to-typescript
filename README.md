@@ -1,4 +1,4 @@
-### gql-to-typescript
+### GQL to Typescript
 
 For usage in your build pipeline please checkout the [webpack plugin](https://github.com/liron-navon/gql-to-typescript-webpack-plugin) or the [cli tool](https://github.com/liron-navon/gql-to-typescript-cli)
 
