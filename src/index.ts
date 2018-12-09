@@ -1,5 +1,5 @@
 import {collectGQLTypeDefs} from "./helpers/files";
-import {GqlToTSConfig, GqlToTSPublicConfig, IKVP} from "./helpers/types";
+import {GqlToTSConfig, GqlToTSFilesConfig, IKVP} from "./helpers/types";
 import {arrayToTruthMapper, getEnumKVP, getObjectKVP} from "./helpers/gqlNodeTools";
 import {TypescriptFileWriter} from "./helpers/TypescriptFileWriter";
 
@@ -23,7 +23,9 @@ const fileMessage = `/*
 *****************************************************
 */`;
 
-export function convertFiles(matcher, options:GqlToTSPublicConfig = {}) {
+export const getDefaultOption = () => Object.assign({}, defaultOptions);
+
+export function convertFiles(matcher, options:GqlToTSFilesConfig = {}) {
     return collectGQLTypeDefs(matcher)
         .then((typeDefs) => {
             convert(Object.assign(options, {typeDefs}))

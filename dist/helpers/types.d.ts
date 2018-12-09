@@ -1,4 +1,4 @@
-export interface GqlToTSFilesConfig {
+export interface GqlToTSPublicConfig {
     outputFile?: string;
     namespace?: string;
     scalars?: any;
@@ -6,17 +6,14 @@ export interface GqlToTSFilesConfig {
     ignoreTypes?: string[];
     silent?: boolean;
 }
-
-export interface GqlToTSConfig extends GqlToTSFilesConfig{
+export interface GqlToTSConfig extends GqlToTSPublicConfig {
     typeDefs?: any;
 }
-
 export interface Mapper {
-    [label: string]: any
+    [label: string]: any;
 }
-
 export interface IKVP {
-    key: any,
-    value: any,
-    description?: Mapper
+    key: any;
+    value: any;
+    description?: Mapper;
 }
