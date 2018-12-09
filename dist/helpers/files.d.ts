@@ -2,7 +2,7 @@
  * find the gql tag and gets it's value using regex
  * @param fileContent
  */
-export declare function getTypeDefsFromFile(fileContent: any): string;
+export declare function getTypeDefsFromFile(fileContent: any): any[];
 /**
  * returning a promise from the glob function and applies needed options
  * @param matcher

@@ -151,8 +151,7 @@ var TypescriptFileWriter = /** @class */ (function () {
         this.fw = new FileWriter_1.FileWriter(this.fullFilePath);
         this.fw.appendLine(startMessage);
         if (options.namespace) {
-            this.fw
-                .appendLine("export namespace " + options.namespace + " {");
+            this.fw.appendLine("export namespace " + options.namespace + " {");
         }
     }
     TypescriptFileWriter.prototype.append = function (str) {
@@ -191,6 +190,13 @@ var TypescriptFileWriter = /** @class */ (function () {
         }
         return "\t\t" + label + "?: " + advancedType + ";";
     };
+    TypescriptFileWriter.prototype.createArrayInterfaceField = function (label, rawType) {
+        // this is in order to support 1d/2d/3d... arrays
+        var arraySymbols = getArraySymbols(rawType);
+        var childType = removeArraySymbols(rawType);
+        var _a = gqlNodeTools_1.getTypeOptions(childType), type = _a.type, required = _a.required;
+        return "\t\t" + label + (required ? '' : '?') + ": " + this.fixTyping(type) + arraySymbols + ";";
+    };
     TypescriptFileWriter.prototype.createRegularInterfaceField = function (label, rawType) {
         var _a = gqlNodeTools_1.getTypeOptions(rawType), type = _a.type, required = _a.required;
         return "\t\t" + label + (required ? '' : '?') + ": " + this.fixTyping(type) + ";";
@@ -203,7 +209,12 @@ var TypescriptFileWriter = /** @class */ (function () {
             var label = _a[0], rawType = _a[1];
             _this.writeDescription("\t", descriptionMap[name + "->" + label]);
             if (typeof rawType === "string") {
-                _this.append(_this.createRegularInterfaceField(label, rawType));
+                if (rawType.endsWith('[]') || rawType.endsWith('[]!')) {
+                    _this.append(_this.createArrayInterfaceField(label, rawType));
+                }
+                else {
+                    _this.append(_this.createRegularInterfaceField(label, rawType));
+                }
             }
             else {
                 _this.append(_this.createAdvancedInterfaceField(label, rawType));
@@ -227,6 +238,21 @@ var TypescriptFileWriter = /** @class */ (function () {
     return TypescriptFileWriter;
 }());
 exports.TypescriptFileWriter = TypescriptFileWriter;
+/**
+ * accept a string with an array symbols such as number[][], and returns the array symbols ('[][]')
+ * @param rawString
+ */
+function getArraySymbols(rawString) {
+    var numberOfMatches = rawString.match(/\[\]/g).length;
+    return '[]'.repeat(numberOfMatches);
+}
+/**
+ * Accept a string with array symbols and return the type without the array part
+ * @param rawString
+ */
+function removeArraySymbols(rawString) {
+    return rawString.replace(/\[\]/g, '');
+}
 
 
 /***/ }),
@@ -258,15 +284,17 @@ function getTypeDefsFromFile(fileContent) {
     // *********8
     // /(gql`)[\S\s]*?(`;|`\s)/g; - had issues with template syntax (${}), and it captured itself.
     // *********8
-    var reg = /(gql`)(?!\))[A-Za-z0-9\s{}"!:\(\)_-]*?((?!\()`;|(?!\()`\s)/g;
+    var reg = /(gql`)(?!\))[A-Za-z0-9\s{}"!:\(\)\[\]_-]*?((?!\()`;|(?!\()`\s)/g;
     var matches = reg.exec(fileContent);
-    if (!matches || matches.length === 0) {
-        return null;
+    var schemas = [];
+    while (matches != null && matches.length > 0) {
+        var gqlTag = matches[0];
+        gqlTag = gqlTag.substr(0, gqlTag.lastIndexOf('`'));
+        gqlTag = gqlTag.substr(gqlTag.indexOf('`') + 1);
+        schemas.push(gqlTag);
+        matches = reg.exec(fileContent);
     }
-    var gqlTag = matches[0];
-    gqlTag = gqlTag.substr(0, gqlTag.lastIndexOf('`'));
-    gqlTag = gqlTag.substr(gqlTag.indexOf('`') + 1);
-    return gqlTag;
+    return schemas;
 }
 exports.getTypeDefsFromFile = getTypeDefsFromFile;
 /**
@@ -293,8 +321,7 @@ function collectGQLTypeDefs(matcher, turnToNodeTree) {
             var content = fs.readFileSync(filePath, "utf8");
             return getTypeDefsFromFile(content);
         })
-            // filter out matching files without gql
-            .filter(function (item) { return item !== null; })
+            .reduce(function (acc, contents) { return acc.concat(contents); }, [])
             .map(function (item) {
             return turnToNodeTree ? graphql_tag_1.default(templateObject_1 || (templateObject_1 = __makeTemplateObject(["", ""], ["", ""])), item) : item;
         });
@@ -375,6 +402,15 @@ function createTypeForFunction(node) {
         returnType: returnType
     };
 }
+function getTypeOfArrayType(arrayTypeNode) {
+    var arrayFix = '';
+    var currentNode = arrayTypeNode;
+    while (currentNode.kind !== 'NamedType') {
+        arrayFix += '[]';
+        currentNode = currentNode.type;
+    }
+    return getName(currentNode) + arrayFix;
+}
 /**
  * gets the type of a node
  * @param node
@@ -384,18 +420,19 @@ function getType(node) {
         var kind = getTypeKind(node);
         var requiredValue = false;
         var type = null;
-        if (kind === 'ListType') {
-            var childName = getName(node.type.type);
-            return childName + "[]";
+        var typeNode = node.type;
+        if (kind === 'NonNullType') {
+            requiredValue = true;
+            typeNode = typeNode.type;
         }
-        if (node.arguments && node.arguments.length > 0) {
+        if (typeNode.kind === 'ListType') {
+            type = getTypeOfArrayType(typeNode);
+        }
+        else if (node.arguments && node.arguments.length > 0) {
             return createTypeForFunction(node);
         }
         else {
-            type = node.type.type ? getName(node.type.type) : getName(node.type);
-        }
-        if (node.type.kind === 'NonNullType') {
-            requiredValue = true;
+            type = getName(typeNode);
         }
         return requiredValue ? type + '!' : type;
     }
@@ -531,7 +568,7 @@ function convertFiles(matcher, options) {
     if (options === void 0) { options = {}; }
     return files_1.collectGQLTypeDefs(matcher)
         .then(function (typeDefs) {
-        convert(Object.assign(options, { typeDefs: typeDefs }));
+        return convert(Object.assign(options, { typeDefs: typeDefs }));
     });
 }
 exports.convertFiles = convertFiles;

@@ -10,6 +10,7 @@ export declare class TypescriptFileWriter {
     writeEnum(name: string, enumarations: Array<string>, descriptionMap: Mapper): void;
     private fixTyping;
     private createAdvancedInterfaceField;
+    private createArrayInterfaceField;
     private createRegularInterfaceField;
     writeInterface(name: string, data: Mapper, descriptionMap: Mapper): void;
     finish(silent?: boolean): Promise<void>;
