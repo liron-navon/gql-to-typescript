@@ -1,5 +1,7 @@
 ### gql-to-typescript
 
+For usage in your build pipeline please checkout the [webpack plugin](https://github.com/liron-navon/gql-to-typescript-webpack-plugin)
+
 ### usage
 
 First you gonna need to install it: `npm install --save gql-to-typescript`
