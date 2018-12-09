@@ -5,14 +5,12 @@ import {TypescriptFileWriter} from "./helpers/TypescriptFileWriter";
 
 const defaultsDeep = require('lodash/defaultsDeep');
 
-const customTypes = {};
-
 const defaultOptions = {
-    scalars: customTypes,
+    scalars: {},
     ignoreFields: ['_empty'],
     ignoreTypes: [],
-    namespace: 'GraphqlTypes',
-    outputFile: 'types.ts',
+    namespace: 'GQLTypes',
+    outputFile: 'GQLTypes.ts',
     silent: false
 };
 
