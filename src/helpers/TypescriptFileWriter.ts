@@ -13,8 +13,7 @@ export class TypescriptFileWriter {
         this.fw = new FileWriter(this.fullFilePath);
         this.fw.appendLine(startMessage);
         if (options.namespace) {
-            this.fw
-                .appendLine(`export namespace ${options.namespace} {`);
+            this.fw.appendLine(`export namespace ${options.namespace} {`);
         }
     }
 
@@ -25,15 +24,15 @@ export class TypescriptFileWriter {
 
     writeDescription(indentation: string, description: string) {
         if (description) {
-            this.append(`${indentation}/* ${description} */`)
+            this.append(`${indentation}/* ${description} */`);
         }
     }
 
     writeEnum(name: string, enumarations: Array<string>, descriptionMap: Mapper) {
         this.writeDescription(`\t`, descriptionMap[name]);
-        this.append(`\texport enum ${name} {`)
+        this.append(`\texport enum ${name} {`);
         enumarations.forEach(e => this.append(`\t\t${e},`));
-        this.append('\t}')
+        this.append('\t}');
     }
 
     private fixTyping(unknownType: string) {
@@ -55,6 +54,14 @@ export class TypescriptFileWriter {
         return `\t\t${label}?: ${advancedType};`;
     }
 
+    private createArrayInterfaceField(label: string, rawType: string) {
+        // this is in order to support 1d/2d/3d... arrays
+        const arraySymbols = getArraySymbols(rawType);
+        const childType = removeArraySymbols(rawType);
+        const {type, required} = getTypeOptions(childType);
+        return `\t\t${label}${required ? '' : '?'}: ${this.fixTyping(type)}${arraySymbols};`;
+    }
+
     private createRegularInterfaceField(label: string, rawType: string) {
         const {type, required} = getTypeOptions(rawType);
         return `\t\t${label}${required ? '' : '?'}: ${this.fixTyping(type)};`;
@@ -66,7 +73,11 @@ export class TypescriptFileWriter {
         Object.entries(data).forEach(([label, rawType]) => {
             this.writeDescription(`\t`, descriptionMap[`${name}->${label}`]);
             if (typeof rawType === "string") {
-                this.append(this.createRegularInterfaceField(label, rawType))
+                if (rawType.endsWith('[]') || rawType.endsWith('[]!')) {
+                    this.append(this.createArrayInterfaceField(label, rawType))
+                } else {
+                    this.append(this.createRegularInterfaceField(label, rawType))
+                }
             } else {
                 this.append(this.createAdvancedInterfaceField(label, rawType))
             }
@@ -90,4 +101,21 @@ export class TypescriptFileWriter {
                 }
             })
     }
+}
+
+/**
+ * accept a string with an array symbols such as number[][], and returns the array symbols ('[][]')
+ * @param rawString
+ */
+function getArraySymbols(rawString: string) {
+    const numberOfMatches = rawString.match(/\[\]/g).length;
+    return '[]'.repeat(numberOfMatches);
+}
+
+/**
+ * Accept a string with array symbols and return the type without the array part
+ * @param rawString
+ */
+function removeArraySymbols(rawString: string) {
+    return rawString.replace(/\[\]/g, '')
 }

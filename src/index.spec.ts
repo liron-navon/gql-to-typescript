@@ -4,15 +4,19 @@ import * as randomUUID from 'uuid/v4';
 import gql from 'graphql-tag';
 import * as fs from 'fs';
 
-// a sample of gql tag usage
-const inputSample = gql`
+// a sample of gql tag usage, when multiple tags exist on the same page they will be merged
+const inputSample1 = gql`
     type Query {
         " get my type and have fun "
         getMyType(testString: String!): MyType
     }
+`;
 
+const inputSample2 = gql`    
     type MyType {
         test: String!
+        array1d: [String]
+        array5d: [[[[[String]]]]]!
     }
 `;
 
@@ -31,6 +35,8 @@ export namespace TestNameSpace {
 	}
 	export interface MyType {
 		test: string;
+		array1d?: string[];
+		array5d: string[][][][][];
 	}
 }
 `;
@@ -58,7 +64,7 @@ test('Creates a file by passing type definitions.', () => {
     return convert({
         outputFile: tempFilePath,
         namespace: 'TestNameSpace',
-        typeDefs: [inputSample],
+        typeDefs: [inputSample1, inputSample2],
         silent: true
     })
         .then(() => {

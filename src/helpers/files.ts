@@ -12,17 +12,18 @@ export function getTypeDefsFromFile(fileContent) {
     // *********8
     // /(gql`)[\S\s]*?(`;|`\s)/g; - had issues with template syntax (${}), and it captured itself.
     // *********8
-    const reg = /(gql`)(?!\))[A-Za-z0-9\s{}"!:\(\)_-]*?((?!\()`;|(?!\()`\s)/g
+    const reg = /(gql`)(?!\))[A-Za-z0-9\s{}"!:\(\)\[\]_-]*?((?!\()`;|(?!\()`\s)/g;
 
     let matches = reg.exec(fileContent);
-    if (!matches || matches.length === 0) {
-        return null;
+    let schemas = [];
+    while (matches != null && matches.length > 0) {
+        let gqlTag = matches[0];
+        gqlTag = gqlTag.substr(0, gqlTag.lastIndexOf('`'));
+        gqlTag = gqlTag.substr(gqlTag.indexOf('`') + 1);
+        schemas.push(gqlTag);
+        matches = reg.exec(fileContent);
     }
-
-    let gqlTag = matches[0];
-    gqlTag = gqlTag.substr(0, gqlTag.lastIndexOf('`'));
-    gqlTag = gqlTag.substr(gqlTag.indexOf('`') + 1);
-    return gqlTag;
+    return schemas;
 }
 
 /**
@@ -46,10 +47,9 @@ export function collectGQLTypeDefs(matcher: string, turnToNodeTree: boolean = tr
             // map files into gql definitions
             return fileNames.map((filePath) => {
                 const content = fs.readFileSync(filePath, "utf8");
-                return getTypeDefsFromFile(content);
+                return getTypeDefsFromFile(content)
             })
-             // filter out matching files without gql
-            .filter(item => item !== null)
+            .reduce((acc, contents) => acc.concat(contents), [])
             .map((item) => {
                 return turnToNodeTree ? gql`${item}` : item
             })

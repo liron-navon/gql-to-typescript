@@ -1,6 +1,6 @@
 {
   "name": "gql-to-typescript",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A library that turns gql tags to typescript",
   "main": "dist/gql-to-typescript.js",
   "repository": "https://github.com/liron-navon/gql-to-typescript",

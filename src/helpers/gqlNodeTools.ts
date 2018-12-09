@@ -44,6 +44,16 @@ function createTypeForFunction(node) {
     };
 }
 
+function getTypeOfArrayType(arrayTypeNode) {
+    let arrayFix = '';
+    let currentNode = arrayTypeNode;
+    while (currentNode.kind !== 'NamedType') {
+        arrayFix += '[]';
+        currentNode = currentNode.type;
+    }
+    return getName(currentNode) + arrayFix;
+}
+
 /**
  * gets the type of a node
  * @param node
@@ -53,18 +63,19 @@ export function getType(node) {
         const kind = getTypeKind(node);
         let requiredValue = false;
         let type = null;
-        if (kind === 'ListType') {
-            const childName = getName(node.type.type);
-            return `${childName}[]`;
-        } if (node.arguments && node.arguments.length > 0) {
+        let typeNode = node.type;
+        if (kind === 'NonNullType') {
+            requiredValue = true;
+            typeNode = typeNode.type;
+        }
+        if (typeNode.kind === 'ListType') {
+            type = getTypeOfArrayType(typeNode);
+        } else if (node.arguments && node.arguments.length > 0) {
             return createTypeForFunction(node);
         } else {
-            type = node.type.type ? getName(node.type.type) : getName(node.type);
+            type = getName(typeNode);
         }
 
-        if (node.type.kind === 'NonNullType') {
-            requiredValue = true;
-        }
         return requiredValue ? type + '!' : type;
     }
 }

@@ -26,7 +26,7 @@ export const getDefaultOption = () => Object.assign({}, defaultOptions);
 export function convertFiles(matcher, options:GqlToTSFilesConfig = {}) {
     return collectGQLTypeDefs(matcher)
         .then((typeDefs) => {
-            convert(Object.assign(options, {typeDefs}))
+            return convert(Object.assign(options, {typeDefs}))
         });
 }
 
